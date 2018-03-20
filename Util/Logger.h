@@ -8,8 +8,9 @@
 #define LOG_DATA 4
 
 #include "Arduino.h"
+#include "Logger.h"
 
-#define LOGGER_USER_FRIENDLY false   // may dramatically decrease performance!
+#define LOGGER_USER_FRIENDLY false   // INCREASES LOOPTIME BY 10 MICROSECONDS
 
 /**
  * Define logger class
@@ -22,6 +23,7 @@ class Logger{
     template<typename T> static void warning(T value);
     template<typename T> static void error(T value);
     template<typename T> static void data(T value);
+    template<typename T> static void logarray(uint8_t loglevel, T& value);
     static uint8_t _loglevel;
     static bool _dataEnabled;
     static bool _userFriendly;
@@ -29,6 +31,14 @@ class Logger{
     static void getLevelWord(uint8_t loglevel, char *buffer);
     static void getMillisString(char *buffer);
 };
+/*
+ * Create templates to check if variable is pointer
+ */
+template<typename T>
+struct is_pointer { static const bool value = false; };
+
+template<typename T>
+struct is_pointer<T*> { static const bool value = true; };
 
 /*
  * Define template methods here. Can't be done in Logger.cpp
@@ -39,7 +49,7 @@ template<typename T> void Logger::log(uint8_t loglevel, T value){
     char prefixBuffer[32] = {0};
     Logger::getPrefixString(loglevel, prefixBuffer);
     Serial.print(prefixBuffer);
-    Serial.print(" ");
+
     Serial.println(value);
   }
 }
@@ -64,6 +74,27 @@ template<typename T> void Logger::data(T value){
   if(Logger::_dataEnabled)
   {
     Logger::log(LOG_DATA, value);
+  }
+}
+
+template<typename T> void Logger::logarray(uint8_t loglevel, T& value){
+  if(loglevel >= Logger::_loglevel)
+  {
+    char prefixBuffer[32] = {0};
+    Logger::getPrefixString(loglevel, prefixBuffer);
+    Serial.print(prefixBuffer);
+
+    uint16_t arraysize = sizeof(T) / sizeof(value[0]);
+    Serial.print("{");
+    for(uint16_t i = 0; i < arraysize; i++)
+    {
+      Serial.print(value[i]);
+      if(i < arraysize - 1)
+      {
+        Serial.print(" ");
+      }
+    }
+    Serial.println("}");
   }
 }
 

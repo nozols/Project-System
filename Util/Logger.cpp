@@ -18,14 +18,14 @@ bool Logger::_dataEnabled = true;
 void Logger::getPrefixString(uint8_t loglevel, char *buffer)
 {
   buffer[0] = '[';
-  char wordBuffer[10] = {0};
+  char wordBuffer[16] = {0};
   Logger::getLevelWord(loglevel, wordBuffer);
 
   strcat(buffer, wordBuffer);
   strcat(buffer, " ");
   Logger::getMillisString(wordBuffer);
   strcat(buffer, wordBuffer);
-  strcat(buffer, "]");
+  strcat(buffer, "] ");
 }
 
 /**
@@ -67,26 +67,27 @@ void Logger::getMillisString(char *buffer)
 
   uint32_t mils = millis();
   uint32_t divider = 3600000;
-  uint32_t hours = mils / divider;
+  // HOURS
+  sprintf(buffer, "%02ld", mils / divider);
+  strcat(buffer, ":");
   mils %= divider;
   divider = 60000;
-  uint16_t minutes = mils / divider;
+  // MINUTES
+  sprintf(buffer + strlen(buffer), "%02ld", mils / divider);
+  strcat(buffer, ":");
   mils %= divider;
   divider = 1000;
-  uint16_t seconds = mils / divider;
+  // SECONDS
+  sprintf(buffer + strlen(buffer), "%02ld", mils / divider);
+  strcat(buffer, ":");
   mils %= divider;
-
-  sprintf(buffer, "%ld", hours);
-  strcat(buffer, ":");
-  sprintf(buffer + strlen(buffer), "%d", minutes);
-  strcat(buffer, ":");
-  sprintf(buffer + strlen(buffer), "%d", seconds);
-  strcat(buffer, ":");
-  sprintf(buffer + strlen(buffer), "%ld", mils);
+  // MILLISECONDS
+  sprintf(buffer + strlen(buffer), "%03ld", mils);
 
   #else
+  uint32_t mils = millis();
 
-  sprintf(buffer, "%ld", millis());
+  sprintf(buffer, "%ld", mils);
 
   #endif
 }
