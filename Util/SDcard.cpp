@@ -1,5 +1,6 @@
 #include "Arduino.h"
 #include "SDcard.h"
+#include "Logger.h"
 
 /**
  * @param uint8_t pinNumber the chip select pin that is connected
@@ -29,27 +30,4 @@ bool SDcard::init()
   }
 
   return _hasInitialized;
-}
-
-/**
- * Log data to the sdcard
- * @param uint8_t loglevel
- * @param char* message the message
- */
-void SDcard::log(uint8_t loglevel, char* message)
-{
-  if(_hasIntialized)
-  {
-    File dataFile = SD.open("testfile.txt", FILE_WRITE);
-
-    if(dataFile)
-    {
-      dataFile.println(message);
-      dataFile.close();
-    }
-    else
-    {
-      Logger::error("Couldn't load file");
-    }
-  }
 }

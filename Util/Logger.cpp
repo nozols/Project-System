@@ -10,6 +10,16 @@ uint8_t Logger::_loglevel = LOG_DEBUG;
  */
 bool Logger::_dataEnabled = true;
 
+uint8_t Logger::_loglevelSD = LOG_INFO;
+
+SDcard Logger::_sdcard(4, "log.txt");
+
+
+bool Logger::init()
+{
+  return _sdcard.init();
+}
+
 /**
  * Get the prefix string for the loglevel
  * @param loglevel {uint8_t} - loglevel
@@ -18,7 +28,7 @@ bool Logger::_dataEnabled = true;
 void Logger::getPrefixString(uint8_t loglevel, char *buffer)
 {
   buffer[0] = '[';
-  char wordBuffer[16] = {0};
+  char wordBuffer[LOGGER_BUFFER_SIZE / 2] = {0};
   Logger::getLevelWord(loglevel, wordBuffer);
 
   strcat(buffer, wordBuffer);

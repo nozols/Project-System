@@ -2,18 +2,24 @@
 #define Logger_h
 
 #define LOG_DEBUG 0
-#define LOG_WARNING 1
-#define LOG_ERROR 2
-#define LOG_INFO 3
+#define LOG_INFO 1
+#define LOG_WARNING 2
+#define LOG_ERROR 3
 #define LOG_DATA 4
+#define LOG_OFF 5
 
 #include "Arduino.h"
+#include "SDcard.h"
+
 #include "Logger.h"
 
+#define LOGGER_SD_ENABLED false      // DECREASES PERFORMANCE
 #define LOGGER_USER_FRIENDLY false   // INCREASES LOOPTIME BY 10 MICROSECONDS
+#define LOGGER_BUFFER_SIZE 32
 
 /**
- * Define logger class
+ * Logger class
+ * Log data
  */
 class Logger{
   public:
@@ -24,34 +30,39 @@ class Logger{
     template<typename T> static void error(T value);
     template<typename T> static void data(T value);
     template<typename T> static void logarray(uint8_t loglevel, T& value);
-    static uint8_t _loglevel;
-    static bool _dataEnabled;
-    static bool _userFriendly;
     static void getPrefixString(uint8_t loglevel, char *buffer);
     static void getLevelWord(uint8_t loglevel, char *buffer);
     static void getMillisString(char *buffer);
+    static bool init();
+    static SDcard _sdcard;
+    static uint8_t _loglevel;
+    static uint8_t _loglevelSD;
+    static bool _dataEnabled;
+    static bool _userFriendly;
 };
-/*
- * Create templates to check if variable is pointer
- */
-template<typename T>
-struct is_pointer { static const bool value = false; };
-
-template<typename T>
-struct is_pointer<T*> { static const bool value = true; };
 
 /*
  * Define template methods here. Can't be done in Logger.cpp
  */
 template<typename T> void Logger::log(uint8_t loglevel, T value){
+  char prefixBuffer[32] = {0};
+  Logger::getPrefixString(loglevel, prefixBuffer);
+
   if(loglevel >= Logger::_loglevel)
   {
-    char prefixBuffer[32] = {0};
-    Logger::getPrefixString(loglevel, prefixBuffer);
     Serial.print(prefixBuffer);
 
     Serial.println(value);
   }
+
+  #if LOGGER_SD_ENABLED
+
+  if(loglevel >= Logger::_loglevelSD)
+  {
+    Logger::_sdcard.log(prefixBuffer, value);
+  }
+
+  #endif
 }
 
 template<typename T> void Logger::debug(T value){
@@ -80,7 +91,7 @@ template<typename T> void Logger::data(T value){
 template<typename T> void Logger::logarray(uint8_t loglevel, T& value){
   if(loglevel >= Logger::_loglevel)
   {
-    char prefixBuffer[32] = {0};
+    char prefixBuffer[LOGGER_BUFFER_SIZE] = {0};
     Logger::getPrefixString(loglevel, prefixBuffer);
     Serial.print(prefixBuffer);
 
