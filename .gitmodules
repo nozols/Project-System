@@ -1,0 +1,3 @@
+[submodule "SdFat"]
+	path = SdFat
+	url = https://github.com/greiman/SdFat.git

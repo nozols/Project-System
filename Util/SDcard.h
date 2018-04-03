@@ -3,7 +3,8 @@
 
 #include "Arduino.h"
 #include <SPI.h>
-#include <SD.h>
+//#include <SD.h>
+#include "SdFat/src/SdFat.h"
 
 class SDcard{
   public:
@@ -15,13 +16,14 @@ class SDcard{
     uint8_t _pinNumber;
     char _filename[32];
     template<typename T> void storeLog(char* prefix, T msg);
+    SdFat _sd;
 };
 
 template<typename T> void SDcard::log(char* prefix, T msg)
 {
   if(_hasInitialized)
   {
-    File dataFile = SD.open(_filename, FILE_WRITE);
+    File dataFile = _sd.open(_filename, FILE_WRITE);
 
     if(dataFile)
     {
