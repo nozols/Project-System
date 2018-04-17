@@ -3,7 +3,7 @@
 
 #include "Arduino.h"
 #include <SPI.h>
-//#include <SD.h>
+
 #include "SdFat/src/SdFat.h"
 
 class SDcard{
@@ -33,7 +33,9 @@ template<typename T> void SDcard::log(char* prefix, T msg)
     }
     else
     {
+      _hasInitialized = false;
       Serial.println("FATAL ERROR: file not readable");
+      Serial.println("DISABLED SD LOGGING!");
     }
   }
 }
