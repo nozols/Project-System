@@ -1,3 +1,6 @@
 [submodule "SdFat"]
 	path = SdFat
 	url = https://github.com/greiman/SdFat.git
+[submodule "MPU6050"]
+	path = MPU6050
+	url = https://github.com/tockn/MPU6050_tockn.git

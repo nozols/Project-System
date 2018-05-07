@@ -10,14 +10,21 @@ uint8_t Logger::_loglevel = LOG_DEBUG;
  */
 bool Logger::_dataEnabled = true;
 
+#if LOGGER_SD_ENABLED
+
 uint8_t Logger::_loglevelSD = LOG_INFO;
 
 SDcard Logger::_sdcard(4, "log.txt");
 
+#endif
 
 bool Logger::init()
 {
+  #if LOGGER_SD_ENABLED
   return _sdcard.init();
+  #else
+  return true;
+  #endif
 }
 
 /**

@@ -1,7 +1,11 @@
+#define LOGGER_SD_ENABLED false
+
 #include "Util\Logger.h"
 #include "Util\SDcard.h"
+#include "MPU6050\src\MPU6050_tockn.h"
+#include <Wire.h>
 
-//SDcard card(4, "log_output.txt");
+MPU6050 gyro(Wire);
 
 bool canStart = true;
 
@@ -12,6 +16,12 @@ void setup()
   Serial.begin(9600);
   Logger::init();
   Logger::info("Starting engines...");
+  Wire.begin();
+  Logger::info("Started wire.h");
+  gyro.begin();
+  Logger::info("Calibrating gyro. Do not move car.");
+  gyro.calcGyroOffsets(false);
+  Logger::info("Finished calibration.");
 
 
   if(!canStart)
@@ -19,26 +29,26 @@ void setup()
     Logger::warning("Could not start the car!");
     while(1){}  // Infinte loop, so void loop() doesn't get called
   }
-  msgTime = millis();
-  Logger::info("Test");
-  Serial.println(millis() - msgTime);
-  msgTime = millis();
-  Logger::info(1234);
-  Serial.println(millis() - msgTime);
-  msgTime = millis();
-  Logger::info(123);
-  Serial.println(millis() - msgTime);
-  msgTime = millis();
-  Logger::info(12345);
-  Serial.println(millis() - msgTime);
-  msgTime = millis();
-  Logger::info(0.2F);
-  Serial.println(millis() - msgTime);
-  msgTime = millis();
+  Logger::error("Test error message");
+  Logger::warning("Test warning message");
+  Logger::debug("Test debug message");
+  Logger::info("Test info message");
 
+    for(byte i = 0; i <= 200; i++){
+      Logger::data("testgraph", i);
+    }
+
+
+    for(int i = 0; i <= 200; i++){
+      Logger::data("Moargraph", sin(i * (3.1415926 / 180)));
+    }
 }
 
 void loop()
 {
-
+  gyro.update();
+  Logger::data("gyro_x", gyro.getAngleX());
+  Logger::data("gyro_y", gyro.getAngleY());
+  Logger::data("gyro_z", gyro.getAngleZ());
+  Logger::data("temp", gyro.getTemp());
 }
