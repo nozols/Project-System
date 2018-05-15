@@ -1,5 +1,6 @@
 #define LOGGER_SD_ENABLED false
 
+#include "control.c"
 #include "Util\Logger.h"
 #include "Util\SDcard.h"
 #include "MPU6050\src\MPU6050_tockn.h"
@@ -42,6 +43,8 @@ void setup()
     for(int i = 0; i <= 200; i++){
       Logger::data("Moargraph", sin(i * (3.1415926 / 180)));
     }
+
+    controlSetup();
 }
 
 void loop()
@@ -51,4 +54,7 @@ void loop()
   Logger::data("gyro_y", gyro.getAngleY());
   Logger::data("gyro_z", gyro.getAngleZ());
   Logger::data("temp", gyro.getTemp());
+
+  controlServo();//<-----moet nog een percentage meegegeven worden!
+  controlMotor();//<-----moet nog een percentage meegegeven worden!
 }
