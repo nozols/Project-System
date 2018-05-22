@@ -1,15 +1,19 @@
 #define LOGGER_SD_ENABLED false
-
-
 #include "Util\Logger.h"
-#include "Util\SDcard.h"
+//#include "Util\SDcard.h"
 #include "MPU6050\src\MPU6050_tockn.h"
 #include <Wire.h>
+#include <Servo.h>
 
 #include "ultrasone_sensor.c"
-#include "control.c"
+#include "temperatuur_sensor.c"
+
+Servo steerServo;
 
 MPU6050 gyro(Wire);
+
+#define SERVOPIN 2
+#define MOTORPIN 3
 
 bool canStart = true;
 
@@ -27,21 +31,43 @@ void setup()
   //gyro.calcGyroOffsets(false);
   Logger::info("Finished calibration.");
   us_initialize();
+  tempSensSetup();
 
+  steerServo.attach(SERVOPIN);
+  pinMode(MOTORPIN, OUTPUT);
 
   if(!canStart)
   {
     Logger::error("Could not start the car!");
     while(1){}  // Infinte loop, so void loop() doesn't get called
   }
-  controlSetup();
   Logger::info("End of setup");
 }
 
 void loop()
 {
-  controlServo();//<-----moet nog een percentage meegegeven worden!
-  controlMotor();//<-----moet nog een percentage meegegeven worden!
+  tempSensLoop();
+  
+  controlServo(50);//<-----moet nog een goed percentage meegegeven worden!
+  controlMotor(50);//<-----moet nog een goed percentage meegegeven worden!
   Logger::info(us_getDistance());
   delay(100);
+}
+
+void controlServo(int turnPercentage)
+{
+  int turnServoValue = map(turnPercentage, 0, 100, 0, 180);//convert procents to Servo value
+  steerServo.write(turnServoValue);
+}
+
+
+void controlMotor(int speedPercentage)
+{
+  if(tempExceededMax == 1)
+  {
+    speedPercentage = map(speedPercentage, 0, 100, 0, 50);//reduce the speed when to hot
+  }
+  
+  int speedPWMValue = map(speedPercentage, 0, 100, 0, 255);//convert procents to PWM value
+  analogWrite(MOTORPIN, speedPWMValue);
 }
