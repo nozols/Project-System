@@ -1,13 +1,9 @@
 #define LOGGER_SD_ENABLED false
 
-
-#include "Util\Logger.h"
-#include "Util\SDcard.h"
-#include "MPU6050\src\MPU6050_tockn.h"
 #include <Wire.h>
-
+#include "Util/Logger.h"
+#include "MPU6050/src/MPU6050_tockn.h"
 #include "ultrasone_sensor.c"
-#include "control.c"
 
 MPU6050 gyro(Wire);
 
@@ -24,7 +20,7 @@ void setup()
   Logger::info("Started wire.h");
   gyro.begin();
   Logger::info("Calibrating gyro. Do not move car.");
-  //gyro.calcGyroOffsets(false);
+  gyro.calcGyroOffsets(false);
   Logger::info("Finished calibration.");
   us_initialize();
 
@@ -34,14 +30,16 @@ void setup()
     Logger::error("Could not start the car!");
     while(1){}  // Infinte loop, so void loop() doesn't get called
   }
-  controlSetup();
+  //controlSetup();
   Logger::info("End of setup");
 }
 
 void loop()
 {
-  controlServo();//<-----moet nog een percentage meegegeven worden!
-  controlMotor();//<-----moet nog een percentage meegegeven worden!
-  Logger::info(us_getDistance());
+  //controlServo(0);//<-----moet nog een percentage meegegeven worden!
+  //controlMotor(0);//<-----moet nog een percentage meegegeven worden!
+  gyro.update();
+  Logger::data("GYRO", gyro.getAngleX());
+  Logger::data("US", us_getDistance());
   delay(100);
 }
