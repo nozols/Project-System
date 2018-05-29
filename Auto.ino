@@ -16,9 +16,6 @@ Servo steerServo;
 #define MAXTEMP 100
 
 bool canStart = true;
-bool tempExceededMax = false;
-
-unsigned long msgTime = 0;
 
 void setup()
 {
@@ -31,12 +28,15 @@ void setup()
   Logger::info("Calibrating gyro. Do not move car.");
   gyro.calcGyroOffsets(false);
   Logger::info("Finished calibration.");
+  Logger::info("Initializing ultrasone sensor");
   us_initialize();
+  Logger::info("Finished initializing ultrasone sensor");
 
-  //I/O declaration
+  Logger::info("Initializing steering servo");
   steerServo.attach(SERVOPIN);
   pinMode(MOTORPIN, OUTPUT);
   pinMode(TEMPPIN, INPUT);
+  Logger::info("Finished initializing steering servo");
 
   if(!canStart)
   {
@@ -48,9 +48,10 @@ void setup()
 
 
 }
-
+int i = 0;
 void loop()
 {
+  i++;
   //controlServo(0);//<-----moet nog een percentage meegegeven worden!
   //controlMotor(0);//<-----moet nog een percentage meegegeven worden!
   gyro.update();
@@ -58,9 +59,9 @@ void loop()
   Logger::data("US", us_getDistance());
   tempSensCheck();
 
-  controlServo(50);//<-----moet nog een goed percentage meegegeven worden!
+  controlServo(i);//<-----moet nog een goed percentage meegegeven worden!
   controlMotor(50);//<-----moet nog een goed percentage meegegeven worden!
-
+  if(i >= 100){ i = 0;}
   Logger::info(us_getDistance());
   delay(100);
 }
@@ -74,7 +75,7 @@ void controlServo(int turnPercentage)
 
 void controlMotor(int speedPercentage)
 {
-  if(tempExceededMax == true)
+  if(tempSensCheck())
   {//check if the temperature is too high
     speedPercentage = map(speedPercentage, 0, 100, 0, 50);//reduce the speed when to hot
   }
@@ -83,14 +84,7 @@ void controlMotor(int speedPercentage)
   analogWrite(MOTORPIN, speedPWMValue);
 }
 
-void tempSensCheck()
+bool tempSensCheck()
 {
-  if(analogRead(TEMPPIN) > MAXTEMP)
-  {
-    tempExceededMax = true;
-  }
-  else
-  {
-    tempExceededMax = false;
-  }
+  return analogRead(TEMPPIN) > MAXTEMP;
 }
