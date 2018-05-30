@@ -3,6 +3,9 @@
  * @date 15-05-18
  * @description functions for the HC-SR04 ultrasone sensor
  */
+#ifndef UltrasoneSensor_h
+#define UltrasoneSensor_h
+
 #include "Arduino.h"
 
 #define US_TRIG_PIN 12
@@ -40,3 +43,5 @@ float us_getDistance()
 {
   return (us_getDuration() / 2) / 29.1;
 }
+
+#endif

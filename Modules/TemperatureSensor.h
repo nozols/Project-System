@@ -3,6 +3,9 @@
  * @date 20-05-18
  * @description functions for the temperature sensors
  */
+#ifndef TemperatureSensor_h
+#define TemperatureSensor_h
+
 #include "Arduino.h"
 
 #define TEMP_PIN A9
@@ -23,3 +26,5 @@ bool temp_isTemperatureTooHigh()
 {
   return analogRead(TEMP_PIN) > TEMP_MAX;
 }
+
+#endif

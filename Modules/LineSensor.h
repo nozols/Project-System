@@ -3,6 +3,9 @@
  * @date 19-05-18
  * @description functions for the qtra linetracker
  */
+#ifndef LineSensor_h
+#define LineSensor_h
+
 #include "Arduino.h"
 #include <QTRSensors.h>
 #include "../Util/Logger.h"
@@ -57,3 +60,5 @@ int qtr_getSteerAmount()
     return difference / 70 + 50; //levert een waarde van 0 tot 100 op. (<50 = links & >50 = rechts)
   }
 }
+
+#endif

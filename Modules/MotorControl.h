@@ -3,6 +3,9 @@
  * @date 15-05-18
  * @description functions for the motor module
  */
+#ifndef MotorControl_h
+#define MotorControl_h
+
 #include "Arduino.h"
 #include <Servo.h>
 
@@ -48,3 +51,5 @@ void motor_controlMotor(int speedPercentage)
   Logger::info(speedPWMValue);
   motor_motorServo.write(speedPWMValue);
 }
+
+#endif
