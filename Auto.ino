@@ -6,7 +6,9 @@
 #include <QTRSensors.h>
 #include "Util/Logger.h"
 #include "MPU6050/src/MPU6050_tockn.h"
-#include "ultrasone_sensor.c"
+#include "Sensors/UltrasoneSensor.h"
+#include "Sensors/LineSensor.h"
+#include "Sensors/TemperatureSensor.h"
 
 MPU6050 gyro(Wire);
 Servo steerServo;
@@ -14,19 +16,6 @@ Servo motorServo;
 
 #define SERVOPIN 11
 #define MOTORPIN 23
-#define TEMPPIN A9
-
-#define MAXTEMP 100
-
-#define QTR_NUM_SENSORS             8  // number of sensors used
-#define QTR_NUM_SAMPLES_PER_SENSOR  4  // average 4 analog samples per sensor reading
-#define QTR_EMITTER_PIN             2  // emitter is controlled by digital pin 2
-#define QTR_MIDDLE_LINE             3500 // puts the value of the middle of the line at 3500
-
-QTRSensorsAnalog qtra((unsigned char[]) {0, 1, 2, 3, 4, 5, 6, 7, 8},
-  QTR_NUM_SENSORS, QTR_NUM_SAMPLES_PER_SENSOR, QTR_EMITTER_PIN);
-unsigned int qtr_sensorValues[QTR_NUM_SENSORS];
-int qtr_lastPosition;
 
 bool canStart = true;
 
@@ -50,18 +39,14 @@ void setup()
   Logger::info("Initializing steering servo");
   steerServo.attach(SERVOPIN);
   motorServo.attach(MOTORPIN);
-  pinMode(TEMPPIN, INPUT);
+  temp_init();
   Logger::info("Finished initializing steering servo");
 
   #if CALIBRATE_SENSORS
-  Logger::info("Calibrating linetracker");
-  for (int i = 0; i < 400; i++)  // make the calibration take about 10 seconds
-  {
-    qtra.calibrate();       // reads all sensors 10 times at 2.5 ms per six sensors (i.e. ~25 ms per call)
-  }
-  Logger::info("Finished calibrating linetracker");
+  qtr_calibrate();
   #endif
-  qtr_lastPosition = qtra.readLine(qtr_sensorValues) - QTR_MIDDLE_LINE;
+  qtr_init();
+
 
   if(!canStart)
   {
@@ -106,32 +91,4 @@ void controlMotor(int speedPercentage)
   //analogWrite(MOTORPIN, speedPWMValue);
   Logger::info(speedPWMValue);
   motorServo.write(speedPWMValue);
-}
-
-/**
- * @return bool is the temperature of the motor too high?
- */
-bool temp_isTemperatureTooHigh()
-{
-  return analogRead(TEMPPIN) > MAXTEMP;
-}
-
-/**
- * Get the steering direction => 0-50 left, 50-100 right
- * @return int
- */
-int qtr_getSteerAmount()
-{
-  int position = qtra.readLine(qtr_sensorValues) - QTR_MIDDLE_LINE; //MIDDLE_LINE zorgt ervoor dat het midden van de lijn wordt aangegeven met 0 i.p.v. 3500.
-  int difference = position - qtr_lastPosition;
-  qtr_lastPosition = position;
-
-  if (((position > 0) && (difference > 0))  || ((position) < 0 && (difference < 0)))
-  {
-    return position / 70 + 50; //levert een waarde van 0 tot 100 op. (<50 = links & >50 = rechts)
-  }
-  else if (position < (difference * -1))
-  {
-    return difference / 70 + 50; //levert een waarde van 0 tot 100 op. (<50 = links & >50 = rechts)
-  }
 }
