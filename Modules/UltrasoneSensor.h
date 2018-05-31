@@ -7,6 +7,7 @@
 #define UltrasoneSensor_h
 
 #include "Arduino.h"
+#include "../Util/Logger.h"
 
 #define US_TRIG_PIN 12
 #define US_ECHO_PIN 13
@@ -15,7 +16,8 @@
 /**
  * Initialize the pins for the ultrasone sensor
  */
-void us_initialize(){
+void us_init(){
+  Logger::info("Initializing ultrasone sensor");
   pinMode(US_TRIG_PIN, OUTPUT);
   pinMode(US_ECHO_PIN, INPUT);
 }

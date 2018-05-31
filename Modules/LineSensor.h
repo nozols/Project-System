@@ -25,6 +25,7 @@ int qtr_lastPosition;
  */
 void qtr_init()
 {
+  Logger::info("Intializing linetracker");
   qtr_lastPosition = qtra.readLine(qtr_sensorValues) - QTR_MIDDLE_LINE;
 }
 

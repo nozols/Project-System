@@ -2,7 +2,6 @@
 #define LOGGER_SD_ENABLED false
 
 #include <Wire.h>
-#include <Servo.h>
 #include "Util/Logger.h"
 #include "MPU6050/src/MPU6050_tockn.h"
 #include "Modules/UltrasoneSensor.h"
@@ -20,23 +19,18 @@ void setup()
   Logger::init();
   Logger::info("Starting engines...");
   Wire.begin();
-  Logger::info("Started wire.h");
+  Logger::info("Started wire");
   gyro.begin();
+  Logger::info("Started gyro");
+  us_init();
+  motor_init();
+  temp_init();
+
   #if CALIBRATE_SENSORS
   Logger::info("Calibrating gyro. Do not move car.");
   gyro.calcGyroOffsets(false);
   Logger::info("Finished calibration.");
-  #endif
-  Logger::info("Initializing ultrasone sensor");
-  us_initialize();
-  Logger::info("Finished initializing ultrasone sensor");
 
-  Logger::info("Initializing steering servo");
-  motor_init();
-  temp_init();
-  Logger::info("Finished initializing steering servo");
-
-  #if CALIBRATE_SENSORS
   qtr_calibrate();
   #endif
   qtr_init();

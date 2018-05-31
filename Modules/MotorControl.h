@@ -7,6 +7,7 @@
 #define MotorControl_h
 
 #include "Arduino.h"
+#include "../Util/Logger.h"
 #include <Servo.h>
 
 #define MOTOR_SERVO_PIN 11
@@ -20,6 +21,7 @@ Servo motor_motorServo;
  */
 void motor_init()
 {
+  Logger::info("Initializing servo and motor");
   motor_steerServo.attach(MOTOR_SERVO_PIN);
   motor_steerServo.attach(MOTOR_MOTOR_PIN);
 }

@@ -7,6 +7,7 @@
 #define TemperatureSensor_h
 
 #include "Arduino.h"
+#include "../Util/Logger.h"
 
 #define TEMP_PIN A9
 #define TEMP_MAX 100
@@ -16,6 +17,7 @@
  */
 void temp_init()
 {
+  Logger::info("Initializing temperature sensor");
   pinMode(TEMP_PIN, INPUT);
 }
 
