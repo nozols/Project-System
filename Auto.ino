@@ -3,16 +3,13 @@
 #define LOGGER_SD_ENABLED false
 #define LOGGER_BLUETOOTH_ENALBED false
 
-#include <Wire.h>
-#include <Servo.h>
 #include "Util/Logger.h"
 #include "MPU6050/src/MPU6050_tockn.h"
 #include "Modules/UltrasoneSensor.h"
 #include "Modules/LineSensor.h"
 #include "Modules/TemperatureSensor.h"
+#include "Modules/GyroSensor.h"
 #include "Modules/MotorControl.h"
-
-MPU6050 gyro(Wire);
 
 bool canStart = true;
 
@@ -23,18 +20,12 @@ void setup()
   Logger::info("Starting engines...");
   Wire.begin();
   Logger::info("Started wire");
-  gyro.begin();
-  gyro.setGyroOffsets(-4.00, -1.2, -1.2);
-  Logger::info("Started gyro");
+
+  gyro_init(CALIBRATE_GYRO);
   us_init();
   motor_init();
   temp_init();
-
-  #if CALIBRATE_GYRO
-  Logger::info("Calibrating gyro. Do not move car.");
-  gyro.calcGyroOffsets(true);
-  Logger::info("Finished calibration.");
-  #endif
+  
   #if CALIBRATE_LINETRACKER
   qtr_calibrate();
   #endif
