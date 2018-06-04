@@ -12,6 +12,9 @@
 #ifndef LOGGER_SD_ENABLED
 #define LOGGER_SD_ENABLED false      // DECREASES PERFORMANCE
 #endif
+#ifndef LOGGER_BLUETOOTH_ENABLED
+#define LOGGER_BLUETOOTH_ENABLED true
+#endif
 #ifndef LOGGER_USER_FRIENDLY
 #define LOGGER_USER_FRIENDLY false   // INCREASES LOOPTIME BY 10 MICROSECONDS
 #endif
@@ -38,7 +41,6 @@ class Logger{
     template<typename T> static void error(T value);
     template<typename T> static void data(T value);
     template<typename T, typename TV> static void data(T name, TV value);
-    template<typename T> static void logarray(uint8_t loglevel, T& value);
     static void getPrefixString(uint8_t loglevel, char *buffer);
     static void getLevelWord(uint8_t loglevel, char *buffer);
     static void getMillisString(char *buffer);
@@ -64,8 +66,12 @@ template<typename T> void Logger::log(uint8_t loglevel, T value){
   if(loglevel >= Logger::_loglevel)
   {
     Serial.print(prefixBuffer);
-
     Serial.println(value);
+
+    #if LOGGER_BLUETOOTH_ENABLED
+    Serial1.print(prefixBuffer);
+    Serial2.println(value);
+    #endif
   }
 
   #if LOGGER_SD_ENABLED
@@ -109,27 +115,13 @@ template<typename T, typename TV> void Logger::data(T name, TV value){
     Serial.print(name);
     Serial.print(" ");
     Serial.println(value);
-  }
-}
 
-template<typename T> void Logger::logarray(uint8_t loglevel, T& value){
-  if(loglevel >= Logger::_loglevel)
-  {
-    char prefixBuffer[LOGGER_BUFFER_SIZE] = {0};
-    Logger::getPrefixString(loglevel, prefixBuffer);
-    Serial.print(prefixBuffer);
-
-    uint16_t arraysize = sizeof(T) / sizeof(value[0]);
-    Serial.print("{");
-    for(uint16_t i = 0; i < arraysize; i++)
-    {
-      Serial.print(value[i]);
-      if(i < arraysize - 1)
-      {
-        Serial.print(" ");
-      }
-    }
-    Serial.println("}");
+    #if LOGGER_BLUETOOTH_ENABLED
+    Serial1.print(prefixBuffer);
+    Serial1.print(name);
+    Serial1.print(" ");
+    Serial1.println(value);
+    #endif
   }
 }
 

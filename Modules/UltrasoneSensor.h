@@ -9,8 +9,8 @@
 #include "Arduino.h"
 #include "../Util/Logger.h"
 
-#define US_TRIG_PIN 12
-#define US_ECHO_PIN 13
+#define US_TRIG_PIN 22
+#define US_ECHO_PIN 23
 #define US_PULSE_IN_TIMEOUT 2000
 
 /**

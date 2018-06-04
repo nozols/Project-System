@@ -14,12 +14,15 @@ bool Logger::_dataEnabled = true;
 
 uint8_t Logger::_loglevelSD = LOG_INFO;
 
-SDcard Logger::_sdcard(4, "log.txt");
+SDcard Logger::_sdcard(16, "log.txt");
 
 #endif
 
 bool Logger::init()
 {
+  #if LOGGER_BLUETOOTH_ENABLED
+  Serial1.begin(9600);
+  #endif
   #if LOGGER_SD_ENABLED
   return _sdcard.init();
   #else

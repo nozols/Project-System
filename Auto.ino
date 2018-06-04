@@ -1,7 +1,10 @@
-#define CALIBRATE_SENSORS false
+#define CALIBRATE_GYRO false
+#define CALIBRATE_LINETRACKER false
 #define LOGGER_SD_ENABLED false
+#define LOGGER_BLUETOOTH_ENALBED false
 
 #include <Wire.h>
+#include <Servo.h>
 #include "Util/Logger.h"
 #include "MPU6050/src/MPU6050_tockn.h"
 #include "Modules/UltrasoneSensor.h"
@@ -21,16 +24,18 @@ void setup()
   Wire.begin();
   Logger::info("Started wire");
   gyro.begin();
+  gyro.setGyroOffsets(-4.00, -1.2, -1.2);
   Logger::info("Started gyro");
   us_init();
   motor_init();
   temp_init();
 
-  #if CALIBRATE_SENSORS
+  #if CALIBRATE_GYRO
   Logger::info("Calibrating gyro. Do not move car.");
-  gyro.calcGyroOffsets(false);
+  gyro.calcGyroOffsets(true);
   Logger::info("Finished calibration.");
-
+  #endif
+  #if CALIBRATE_LINETRACKER
   qtr_calibrate();
   #endif
   qtr_init();
@@ -45,10 +50,26 @@ void setup()
   Logger::info("End of setup");
 }
 
+String str = "";
+
 void loop()
 {
-  Logger::data("us", us_getDistance());
-  Logger::data("gx", gyro.getAngleX());
-  Logger::data("temp", temp_isTemperatureTooHigh());
-  Logger::data("steer", qtr_getSteerAmount());
+  //gyro.update();
+  //Logger::data("us", us_getDistance());
+  //Logger::data("gx", gyro.getAngleX());
+  //Logger::data("temp", temp_isTemperatureTooHigh());
+  //Logger::data("steer", qtr_getSteerAmount());
+  //qtr_getSteerAmount();
+  while(Serial.available() >= 1)
+  {
+    char read = Serial.read();
+
+    if(read == '\n'){
+      motor_controlMotor(MOTOR_FORWARD, str.toInt());
+      Logger::info(str.toInt());
+      str = "";
+    }else{
+      str += read;
+    }
+  }
 }
