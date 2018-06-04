@@ -10,12 +10,12 @@
 #include "../Util/Logger.h"
 #include <Servo.h>
 
-#define MOTOR_SERVO_PIN 11
+#define MOTOR_SERVO_PIN 22
 #define MOTOR_FORWARD LOW
 #define MOTOR_BACKWARD HIGH
 #define MOTOR_DIRECTION_PIN 2
 #define MOTOR_SPEED_PIN 3
-#define MOTOR_MAX_STEER_ANGLE 40
+#define MOTOR_MAX_STEER_ANGLE 50
 
 Servo motor_steerServo;
 

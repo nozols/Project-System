@@ -10,13 +10,9 @@ uint8_t Logger::_loglevel = LOG_DEBUG;
  */
 bool Logger::_dataEnabled = true;
 
-#if LOGGER_SD_ENABLED
-
 uint8_t Logger::_loglevelSD = LOG_INFO;
 
-SDcard Logger::_sdcard(16, "log.txt");
-
-#endif
+SDcard Logger::_sdcard(53, "log.txt");
 
 bool Logger::init()
 {
@@ -109,5 +105,15 @@ void Logger::getMillisString(char *buffer)
 
   sprintf(buffer, "%ld", mils);
 
+  #endif
+}
+
+void Logger::loop()
+{
+  #if LOGGER_BLUETOOTH_ENALBED
+  while(Serial1.available() > 1)
+  {
+
+  }
   #endif
 }

@@ -21,9 +21,8 @@
 
 #include "Arduino.h"
 
-#if LOGGER_SD_ENABLED
+
 #include "SDcard.h"
-#endif
 
 #include "Logger.h"
 
@@ -45,12 +44,9 @@ class Logger{
     static void getLevelWord(uint8_t loglevel, char *buffer);
     static void getMillisString(char *buffer);
     static bool init();
-
-    #if LOGGER_SD_ENABLED
+    static void loop();
     static SDcard _sdcard;
     static uint8_t _loglevelSD;
-    #endif
-
     static uint8_t _loglevel;
     static bool _dataEnabled;
     static bool _userFriendly;
@@ -70,7 +66,7 @@ template<typename T> void Logger::log(uint8_t loglevel, T value){
 
     #if LOGGER_BLUETOOTH_ENABLED
     Serial1.print(prefixBuffer);
-    Serial2.println(value);
+    Serial1.println(value);
     #endif
   }
 

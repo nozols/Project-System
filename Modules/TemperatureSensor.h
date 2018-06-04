@@ -9,7 +9,7 @@
 #include "Arduino.h"
 #include "../Util/Logger.h"
 
-#define TEMP_PIN A15
+#define TEMP_PIN A7
 #define TEMP_MAX 100
 
 /**

@@ -12,10 +12,10 @@
 
 #define QTR_NUM_SENSORS             8  // number of sensors used
 #define QTR_NUM_SAMPLES_PER_SENSOR  4  // average 4 analog samples per sensor reading
-#define QTR_EMITTER_PIN             2  // emitter is controlled by digital pin 2
+#define QTR_EMITTER_PIN             48  // emitter is controlled by digital pin 2
 #define QTR_MIDDLE_LINE             3500 // puts the value of the middle of the line at 3500
 
-QTRSensorsAnalog qtra((unsigned char[]) {7, 8, 9, 10, 11, 12, 13, 14},
+QTRSensorsAnalog qtra((unsigned char[]) {8, 9, 10, 11, 12, 13, 14, 15},
   QTR_NUM_SENSORS, QTR_NUM_SAMPLES_PER_SENSOR, QTR_EMITTER_PIN);
 unsigned int qtr_sensorValues[QTR_NUM_SENSORS];
 int qtr_lastPosition;

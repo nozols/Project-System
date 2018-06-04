@@ -15,7 +15,7 @@ void gyro_init(bool calibrate)
 {
   Logger::info("Initializing gyro");
   gyro.begin();
-  gyro.setGyroOffsets(-4.00, -1.2, -1.2);
+  gyro.setGyroOffsets(-1.88, -1.72, -1.72);
 
   if(calibrate)
   {
@@ -30,7 +30,7 @@ void gyro_init(bool calibrate)
 float gyro_getAngle()
 {
   gyro.update();
-  return gyro.getAngleX();
+  return gyro.getAngleY();
 }
 
 #endif
