@@ -42,7 +42,7 @@ void loop()
   //Logger::data("gx", gyro_getAngle());
   //Logger::data("temp", temp_isTemperatureTooHigh());
   //Logger::data("steer", qtr_getSteerAmount());
-  qtr_getSteerAmount();
+  motor_controlServo(qtr_getSteerAmount());
   while(Serial1.available() >= 1)
   {
     char read = Serial1.read();
