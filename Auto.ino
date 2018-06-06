@@ -1,7 +1,7 @@
-#define CALIBRATE_GYRO false
+#define CALIBRATE_GYRO true
 #define CALIBRATE_LINETRACKER true
 #define LOGGER_SD_ENABLED true
-#define LOGGER_BLUETOOTH_ENALBED true
+#define LOGGER_BLUETOOTH_ENABLED true
 
 #include "Util/Logger.h"
 #include "MPU6050/src/MPU6050_tockn.h"
@@ -29,16 +29,32 @@ void setup()
   #endif
   qtr_init();
 
-
+  motor_controlMotor(MOTOR_FORWARD, 180);
   Logger::info("End of setup");
 }
 
 String str = "";
-
+int stopSpeed = 0;
 void loop()
 {
+
+  float distance = us_getDistance();
+  if(distance != 0.0 && distance < 20.0 && motor_getCurrentSpeed() != 0)
+  {
+    stopSpeed = motor_getCurrentSpeed();
+    motor_stop();
+    Logger::debug(distance);
+    Logger::warning("Stopped car because object is too close!");
+  }
+  else if(stopSpeed != 0 && distance == 0.0)
+  {
+    Logger::info("Object removed, car is moving again");
+    motor_controlMotor(MOTOR_FORWARD, stopSpeed);
+    stopSpeed = 0;
+  }
+
   //gyro.update();
-  //Logger::data("us", us_getDistance());
+//  Logger::data("us", us_getDistance());
   //Logger::data("gx", gyro_getAngle());
   //Logger::data("temp", temp_isTemperatureTooHigh());
   //Logger::data("steer", qtr_getSteerAmount());
@@ -48,7 +64,7 @@ void loop()
     char read = Serial1.read();
 
     if(read == '\n'){
-      motor_controlServo(str.toInt());
+      motor_controlMotor(MOTOR_FORWARD, str.toInt());
       Logger::info(str.toInt());
       str = "";
     }else{

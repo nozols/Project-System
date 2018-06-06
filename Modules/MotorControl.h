@@ -10,14 +10,17 @@
 #include "../Util/Logger.h"
 #include <Servo.h>
 
-#define MOTOR_SERVO_PIN 22
-#define MOTOR_FORWARD LOW
-#define MOTOR_BACKWARD HIGH
-#define MOTOR_DIRECTION_PIN 2
-#define MOTOR_SPEED_PIN 3
-#define MOTOR_MAX_STEER_ANGLE 50
+#define MOTOR_SERVO_PIN             22
+#define MOTOR_FORWARD               LOW   // mode for going forward
+#define MOTOR_BACKWARD              HIGH  // mode for going backwards
+#define MOTOR_DIRECTION_PIN         2     // pin for direction
+#define MOTOR_SPEED_PIN             3     // pin for speed (pwm)
+#define MOTOR_MAX_STEER_ANGLE       15    // maximum angle for servo
+#define MOTOR_STEER_AGRESSIVENESS   40
 
 Servo motor_steerServo;
+
+int motor_currentSpeed = 0;
 
 /**
  * Initialize motor modules
@@ -34,13 +37,14 @@ void motor_init()
 
 void motor_controlMotor(uint8_t direction, uint8_t speed)
 {
+  motor_currentSpeed = speed;
   digitalWrite(MOTOR_DIRECTION_PIN, direction);
   analogWrite(MOTOR_SPEED_PIN, speed);
 }
 
 void motor_stop()
 {
-  analogWrite(MOTOR_SPEED_PIN, 0);
+  motor_controlMotor(MOTOR_FORWARD, 0);
 }
 
 /**
@@ -50,8 +54,14 @@ void motor_stop()
  */
 void motor_controlServo(int turnPercentage)
 {
-  int turnServoValue = map(turnPercentage, 0, 100, 90 - MOTOR_MAX_STEER_ANGLE, 90 + MOTOR_MAX_STEER_ANGLE);//convert procents to Servo value
+  int turnServoValue = map(turnPercentage, MOTOR_STEER_AGRESSIVENESS, 100 - MOTOR_STEER_AGRESSIVENESS, 90 - MOTOR_MAX_STEER_ANGLE, 90 + MOTOR_MAX_STEER_ANGLE);//convert procents to Servo value
+  Logger::debug(turnServoValue);
   motor_steerServo.write(turnServoValue);
+}
+
+int motor_getCurrentSpeed()
+{
+  return motor_currentSpeed;
 }
 
 #endif
