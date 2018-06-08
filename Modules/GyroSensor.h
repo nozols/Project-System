@@ -1,3 +1,8 @@
+/*
+ * @author Niels de Boer
+ * @date 05-06-18
+ * @description Functions for the gyroscope
+ */
 #ifndef GyroSensor_h
 #define GyroSensor_h
 
@@ -6,6 +11,17 @@
 #include "../MPU6050/src/MPU6050_tockn.h"
 
 MPU6050 gyro(Wire);
+
+float gyro_startAngle = 0;  // the angle at which the gyro was at initialization
+
+/**
+ * @returns get the angle of the gyro
+ */
+float gyro_getAngle()
+{
+  gyro.update();
+  return gyro.getAngleY() - gyro_startAngle;
+}
 
 /**
  * Initialize the gyro
@@ -21,16 +37,9 @@ void gyro_init(bool calibrate)
   {
     gyro.calcGyroOffsets(true);
   }
-
-}
-
-/**
- * @returns get the angle of the gyro
- */
-float gyro_getAngle()
-{
-  gyro.update();
-  return gyro.getAngleY();
+  delay(1000);
+  gyro_startAngle = gyro_getAngle();
+  Logger::info(gyro_startAngle);
 }
 
 #endif

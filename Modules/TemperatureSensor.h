@@ -2,6 +2,7 @@
  * @author Peter van Breugel
  * @date 20-05-18
  * @description functions for the temperature sensors
+ * @notimplemented
  */
 #ifndef TemperatureSensor_h
 #define TemperatureSensor_h

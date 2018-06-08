@@ -1,3 +1,8 @@
+/*
+ * @author Niels de Boer
+ * @date 15-05-18
+ * @description SDcard functions for logger library
+ */
 #ifndef SDcard_h
 #define SDcard_h
 

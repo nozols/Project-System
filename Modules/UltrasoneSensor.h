@@ -9,9 +9,9 @@
 #include "Arduino.h"
 #include "../Util/Logger.h"
 
-#define US_TRIG_PIN 10
-#define US_ECHO_PIN 11
-#define US_PULSE_IN_TIMEOUT 2000
+#define US_TRIG_PIN 10             // trigger pin
+#define US_ECHO_PIN 11             // echo pin
+#define US_PULSE_IN_TIMEOUT 2000   // pulse timeout
 
 /**
  * Initialize the pins for the ultrasone sensor

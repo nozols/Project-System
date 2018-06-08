@@ -10,6 +10,12 @@
 #include "Modules/TemperatureSensor.h"
 #include "Modules/GyroSensor.h"
 #include "Modules/MotorControl.h"
+#include "Modules/BluetoothControl.h"
+
+int runningMode = 0;          // current mode of the car
+int stopSpeed = 0;            // speed at which the car was stopped by the ultrasone sensor
+bool gyroFlag = false;        // has the angle been reached yet?
+bool gyroHasStopped = false;  // has the gyro already stopped the car?
 
 void setup()
 {
@@ -23,27 +29,34 @@ void setup()
   us_init();
   motor_init();
   temp_init();
+  bluetooth_init(&runningMode);
 
   #if CALIBRATE_LINETRACKER
   qtr_calibrate();
   #endif
   qtr_init();
 
-  motor_controlMotor(MOTOR_FORWARD, 180);
   Logger::info("End of setup");
+  Logger::info(3);
+  delay(1000);
+  Logger::info(2);
+  delay(1000);
+  Logger::info(1);
+  delay(1000);
+  Logger::info("Enabled motor");
+  motor_controlMotor(MOTOR_FORWARD, 180);
+
 }
 
-String str = "";
-int stopSpeed = 0;
 void loop()
 {
+  bluetooth_loop();
 
   float distance = us_getDistance();
   if(distance != 0.0 && distance < 20.0 && motor_getCurrentSpeed() != 0)
   {
     stopSpeed = motor_getCurrentSpeed();
     motor_stop();
-    Logger::debug(distance);
     Logger::warning("Stopped car because object is too close!");
   }
   else if(stopSpeed != 0 && distance == 0.0)
@@ -53,22 +66,26 @@ void loop()
     stopSpeed = 0;
   }
 
-  //gyro.update();
-//  Logger::data("us", us_getDistance());
-  //Logger::data("gx", gyro_getAngle());
-  //Logger::data("temp", temp_isTemperatureTooHigh());
-  //Logger::data("steer", qtr_getSteerAmount());
-  motor_controlServo(qtr_getSteerAmount());
-  while(Serial1.available() >= 1)
+  if(runningMode == 0)
   {
-    char read = Serial1.read();
+    float gyroAngle = gyro_getAngle();
 
-    if(read == '\n'){
-      motor_controlMotor(MOTOR_FORWARD, str.toInt());
-      Logger::info(str.toInt());
-      str = "";
-    }else{
-      str += read;
+    if(gyroAngle < -10)
+    {
+      gyroFlag = true;
+
+    }else if(gyroFlag && gyroAngle > -4)
+    {
+      if(!gyroHasStopped)
+      {
+        Logger::info("Reached end of track");
+        motor_stop();
+        gyroHasStopped = true;
+      }
+
     }
+
+    motor_controlServo(qtr_getSteerAmount());
   }
+
 }

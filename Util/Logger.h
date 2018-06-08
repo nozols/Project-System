@@ -1,6 +1,12 @@
+/*
+ * @author Niels de Boer
+ * @date 15-05-18
+ * @description Logger library that makes serial printing more client friendly
+ */
 #ifndef Logger_h
 #define Logger_h
 
+// Loglevels and their corresponding values
 #define LOG_DEBUG 0
 #define LOG_INFO 1
 #define LOG_WARNING 2
@@ -20,12 +26,8 @@
 #endif
 
 #include "Arduino.h"
-
-
 #include "SDcard.h"
-
 #include "Logger.h"
-
 
 /**
  * Logger class
@@ -46,6 +48,7 @@ class Logger{
     static bool init();
     static void loop();
     static SDcard _sdcard;
+    static uint8_t _loglevelBluetooth;
     static uint8_t _loglevelSD;
     static uint8_t _loglevel;
     static bool _dataEnabled;
@@ -63,12 +66,17 @@ template<typename T> void Logger::log(uint8_t loglevel, T value){
   {
     Serial.print(prefixBuffer);
     Serial.println(value);
+  }
 
-    #if LOGGER_BLUETOOTH_ENABLED
+  #if LOGGER_BLUETOOTH_ENABLED
+
+  if(loglevel >= Logger::_loglevelBluetooth)
+  {
     Serial1.print(prefixBuffer);
     Serial1.println(value);
-    #endif
   }
+
+  #endif
 
   #if LOGGER_SD_ENABLED
 

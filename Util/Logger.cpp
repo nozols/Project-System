@@ -1,16 +1,10 @@
 #include "Arduino.h"
 #include "Logger.h"
 
-/**
- * @var Stores loglevel that is currently used
- */
 uint8_t Logger::_loglevel = LOG_DEBUG;
-/**
- * @var enable/disable data
- */
-bool Logger::_dataEnabled = true;
-
 uint8_t Logger::_loglevelSD = LOG_INFO;
+uint8_t Logger::_loglevelBluetooth = LOG_INFO;
+bool Logger::_dataEnabled = true;
 
 SDcard Logger::_sdcard(53, "log.txt");
 
@@ -105,15 +99,5 @@ void Logger::getMillisString(char *buffer)
 
   sprintf(buffer, "%ld", mils);
 
-  #endif
-}
-
-void Logger::loop()
-{
-  #if LOGGER_BLUETOOTH_ENALBED
-  while(Serial1.available() > 1)
-  {
-
-  }
   #endif
 }
